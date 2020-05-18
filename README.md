@@ -1,2 +1,2 @@
-# miniroster
-Mini roster 
+# Mini Roster
+A quick demonstration of a roster application. 
