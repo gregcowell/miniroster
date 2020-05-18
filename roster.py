@@ -76,7 +76,7 @@ def enforce_days_per_roster(group, days_per_roster):
             model.Add(sum(shifts) == days_per_roster)
 
 
-# Days per roster 
+# Days per roster
 enforce_days_per_roster(group=1, days_per_roster=3)
 enforce_days_per_roster(group=2, days_per_roster=2)
 enforce_days_per_roster(group=3, days_per_roster=2)
