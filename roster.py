@@ -84,7 +84,7 @@ enforce_days_per_roster(group=4, days_per_roster=2)
 enforce_days_per_roster(group=5, days_per_roster=1)
 
 
-def enforce_min_days_per_roster(group, days_per_roster):
+def enforce_group_together(group, days_per_roster):
     intermediate_shift_vars = [
         model.NewBoolVar(f"shift{shift}") for shift in range(num_shifts)
     ]
@@ -106,8 +106,8 @@ def enforce_min_days_per_roster(group, days_per_roster):
         )
 
 
-# Min days per roster (one specific group)
-enforce_min_days_per_roster(group=6, days_per_roster=1)
+# Schedule group 6 together for 1 day
+enforce_group_together(group=6, days_per_roster=1)
 
 
 def enforce_supervisor(group, supervisors):
