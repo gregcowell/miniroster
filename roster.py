@@ -13,7 +13,7 @@ log = logging.getLogger("treasury")
 
 staff = {
     "LaurenC": [1, 6],
-    "Alex": [1],
+    "Alex": [1, 6],
     "Belinda": [2, 6],
     "Greg": [2, 6],
     "Angela": [2, 6],
@@ -65,7 +65,7 @@ for staff_member in staff:
         model.Add(sum(shifts) <= 1)
 
 
-def enforce_max_days_per_roster(group, days_per_roster):
+def enforce_days_per_roster(group, days_per_roster):
     for staff_member in staff:
         if group in staff[staff_member]:
             shifts = [
@@ -76,12 +76,12 @@ def enforce_max_days_per_roster(group, days_per_roster):
             model.Add(sum(shifts) == days_per_roster)
 
 
-# Max days per roster (all groups)
-enforce_max_days_per_roster(group=1, days_per_roster=3)
-enforce_max_days_per_roster(group=2, days_per_roster=2)
-enforce_max_days_per_roster(group=3, days_per_roster=2)
-enforce_max_days_per_roster(group=4, days_per_roster=2)
-enforce_max_days_per_roster(group=5, days_per_roster=1)
+# Days per roster 
+enforce_days_per_roster(group=1, days_per_roster=3)
+enforce_days_per_roster(group=2, days_per_roster=2)
+enforce_days_per_roster(group=3, days_per_roster=2)
+enforce_days_per_roster(group=4, days_per_roster=2)
+enforce_days_per_roster(group=5, days_per_roster=1)
 
 
 def enforce_min_days_per_roster(group, days_per_roster):
