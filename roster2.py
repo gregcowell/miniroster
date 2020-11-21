@@ -10,6 +10,9 @@ class SolutionNotFeasible(Exception):
 
 
 log = logging.getLogger("roster")
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
+)
 
 # First day must be Monday
 num_days = 28
@@ -113,13 +116,16 @@ if solution_status == cp_model.MODEL_INVALID:
     log.info("Solution is MODEL_INVALID")
 if solution_status == cp_model.UNKNOWN:
     log.info("Solution is UNKNOWN")
+if solution_status == cp_model.FEASIBLE:
+    log.info("Solution is FEASIBLE")
+if solution_status == cp_model.OPTIMAL:
+    log.info("Solution is OPTIMAL")
 if (
     solution_status != cp_model.FEASIBLE
     and solution_status != cp_model.OPTIMAL
 ):
     log.info("No feasible solution, raising exception...")
     raise SolutionNotFeasible("No feasible solutions.")
-
 
 # Display shifts
 for day in range(1, num_days + 1):
