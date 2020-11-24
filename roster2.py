@@ -71,6 +71,16 @@ def enforce_shifts_already_worked(
                 )
 
 
+def get_valid_shift_sequence_combinations(
+    valid_shift_sequences, days_in_partial_sequence
+):
+    """Get valid shift sequence combinations."""
+    valid_shift_sequence_combinations = []
+    # Split into atomic units
+    # Partials can only be first
+    return valid_shift_sequence_combinations
+
+
 def enforce_shift_sequences(
     staff,
     shift_vars,
@@ -543,6 +553,10 @@ def main():
     )
     enforce_shifts_already_worked(
         staff, previous_shifts, shifts, shift_days, model, shift_vars
+    )
+    days_in_partial_sequence = 7
+    get_valid_shift_sequence_combinations(
+        valid_shift_sequences, days_in_partial_sequence
     )
     enforce_shift_sequences(
         staff,
