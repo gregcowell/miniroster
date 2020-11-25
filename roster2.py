@@ -43,7 +43,7 @@ def create_shift_vars(prev_shift_vars, model, staff, shifts, shift_days):
 
 
 def enforce_shifts_already_worked(
-    staff, previous_shifts, shifts, shift_days, model, shift_vars
+    staff, previous_shifts, shifts, shift_days, model, shift_vars, num_days
 ):
     """Enforce shifts already worked."""
     for staff_member in staff:
@@ -56,7 +56,7 @@ def enforce_shifts_already_worked(
                                 (
                                     staff_member,
                                     staff[staff_member][0],
-                                    day + 1,
+                                    day + 1 - num_days,
                                     shift,
                                 )
                             ]
@@ -65,20 +65,29 @@ def enforce_shifts_already_worked(
             else:
                 model.Add(
                     shift_vars[
-                        (staff_member, staff[staff_member][0], day + 1, shift)
+                        (
+                            staff_member,
+                            staff[staff_member][0],
+                            day + 1 - num_days,
+                            shift,
+                        )
                     ]
                     == 1
                 )
 
 
-def get_valid_shift_sequence_combinations(
+def get_valid_shift_sequence_permutations(
     valid_shift_sequences, days_in_partial_sequence
 ):
-    """Get valid shift sequence combinations."""
-    valid_shift_sequence_combinations = []
+    """Get valid shift sequence permutations."""
+    valid_shift_sequence_permutations = []
+    num_shift_sequences = len(valid_shift_sequences)
+    for shift_sequence in valid_shift_sequences:
+        pass
     # Split into atomic units
     # Partials can only be first
-    return valid_shift_sequence_combinations
+    # Only include previous roster if current
+    return valid_shift_sequence_permutations
 
 
 def enforce_shift_sequences(
@@ -178,10 +187,10 @@ def solve(model):
 
 def display_shifts(num_days, shifts, shift_days, staff, shift_vars, solver):
     """Display shifts."""
-    for day in range(1, num_days + 1):
+    for day in range(1 - num_days, num_days + 1):
         print(f"Day {day}: ", end="")
         for shift in shifts:
-            if day in shift_days[shift]:
+            if day in shift_days[shift] or day + num_days in shift_days[shift]:
                 print(f"{shift}: ", end="")
             for staff_member in staff:
                 for role in staff[staff_member]:
@@ -552,10 +561,10 @@ def main():
         previous_shift_vars, model, staff, shifts, shift_days
     )
     enforce_shifts_already_worked(
-        staff, previous_shifts, shifts, shift_days, model, shift_vars
+        staff, previous_shifts, shifts, shift_days, model, shift_vars, num_days
     )
     days_in_partial_sequence = 7
-    get_valid_shift_sequence_combinations(
+    get_valid_shift_sequence_permutations(
         valid_shift_sequences, days_in_partial_sequence
     )
     enforce_shift_sequences(
@@ -586,20 +595,22 @@ def main():
     solver = solve(model)
     display_shifts(num_days, shifts, shift_days, staff, shift_vars, solver)
 
+    # for staff_member in staff:
+    #     for role in staff[staff_member]:
+    #         for day in range(1 - num_days, num_days + 1):
+    #             for shift in shifts:
+    #                 if (
+    #                     day in shift_days[shift]
+    #                     or day + num_days in shift_days[shift]
+    #                 ):
+    #                     print(shift_vars[(staff_member, role, day, shift)])
+
 
 log = logging.getLogger("roster")
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
 )
 main()
-
-
-# for staff_member in staff:
-#     for role in staff[staff_member]:
-#         for day in range(1, num_days + 1):
-#             for shift in shifts:
-#                 if day in shift_days[shift]:
-#                     print(shift_vars[(staff_member, role, day, shift)])
 
 
 # Objective function, number of shifts equal
