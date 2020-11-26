@@ -1,5 +1,6 @@
 """Mini roster 2."""
 import logging
+from itertools import permutations
 from ortools.sat.python import cp_model
 
 
@@ -77,17 +78,73 @@ def enforce_shifts_already_worked(
 
 
 def get_valid_shift_sequence_permutations(
-    valid_shift_sequences, days_in_partial_sequence
+    valid_shift_sequences, days_in_partial_sequence, num_days
 ):
     """Get valid shift sequence permutations."""
+    shift_sequence_begin_segments = []
+    shift_sequence_end_segments = []
+    for valid_shift_sequence in valid_shift_sequences:
+        if len(valid_shift_sequence) > days_in_partial_sequence:
+            shift_sequence_begin_segments.append(
+                valid_shift_sequence[0:days_in_partial_sequence]
+            )
+            shift_sequence_end_segments.append(
+                valid_shift_sequence[-days_in_partial_sequence:]
+            )
+    # print(f"Valid: {valid_shift_sequences}")
+    # print(f"Valid Begin: {shift_sequence_begin_segments}")
+    # print(f"Valid End: {shift_sequence_end_segments}")
+    all_shift_sequences = (
+        valid_shift_sequences
+        + shift_sequence_begin_segments
+        + shift_sequence_end_segments
+    )
+    # print(f"All: {all_shift_sequences}")
+
+    # all_shift_sequence_permutations = []
+    # for size in range(1, len(all_shift_sequences)):
+    #     for shift_sequence in permutations(all_shift_sequences, size):
+    #         all_shift_sequence_permutations.append(shift_sequence)
+
+    all_shift_sequence_permutations = [
+        shift_sequence
+        for size in range(1, len(all_shift_sequences))
+        for shift_sequence in permutations(all_shift_sequences, size)
+    ]
+
+    valid_shift_sequence_permutations_interim = [
+        shift_sequence
+        for shift_sequence in all_shift_sequence_permutations
+        if get_length_of_list_of_tuples(shift_sequence) == num_days
+    ]
+
+    # for i, valid_shift_sequence_permutation in enumerate(
+    #     valid_shift_sequence_permutations
+    # ):
+    #     print(
+    #         f"{i + 1}: Length:{get_length_of_list_of_tuples(valid_shift_sequence_permutation)} Perm:{valid_shift_sequence_permutation}"
+    #     )
+
     valid_shift_sequence_permutations = []
-    num_shift_sequences = len(valid_shift_sequences)
-    for shift_sequence in valid_shift_sequences:
-        pass
-    # Split into atomic units
-    # Partials can only be first
-    # Only include previous roster if current
+    for tuple_of_shift_lists in valid_shift_sequence_permutations_interim:
+        # tuple of lists -> tuple of shifts
+        all_shifts = []
+        for list_of_shifts in tuple_of_shift_lists:
+            for shift in list_of_shifts:
+                all_shifts.append(shift)
+        valid_shift_sequence_permutations.append(tuple(all_shifts))
+
+    for perm in valid_shift_sequence_permutations:
+        print(f"Perms:{perm}")
     return valid_shift_sequence_permutations
+
+
+def get_length_of_list_of_tuples(list_of_tuples):
+    """Get the total length of a list of tuples."""
+    length = 0
+    for tuple_item in list_of_tuples:
+        length += len(tuple_item)
+    return length
 
 
 def enforce_shift_sequences(
@@ -97,7 +154,7 @@ def enforce_shift_sequences(
     shift_days,
     num_days,
     model,
-    valid_shift_sequences,
+    valid_shift_sequence_permutations,
 ):
     """Enforce shift sequences."""
     for staff_member in staff:
@@ -564,8 +621,8 @@ def main():
         staff, previous_shifts, shifts, shift_days, model, shift_vars, num_days
     )
     days_in_partial_sequence = 7
-    get_valid_shift_sequence_permutations(
-        valid_shift_sequences, days_in_partial_sequence
+    valid_shift_sequence_permutations = get_valid_shift_sequence_permutations(
+        valid_shift_sequences, days_in_partial_sequence, num_days
     )
     enforce_shift_sequences(
         staff,
@@ -574,7 +631,7 @@ def main():
         shift_days,
         num_days,
         model,
-        valid_shift_sequences,
+        valid_shift_sequence_permutations,
     )
     skill_mix_vars = create_skill_mix_vars(
         model, shifts, shift_days, skill_mix_rules
