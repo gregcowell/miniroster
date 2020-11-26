@@ -78,7 +78,11 @@ def enforce_shifts_already_worked(
 
 
 def get_valid_shift_sequence_permutations(
-    valid_shift_sequences, days_in_partial_sequence, num_days
+    valid_shift_sequences,
+    days_in_partial_sequence,
+    num_days,
+    shift_days,
+    shifts,
 ):
     """Get valid shift sequence permutations."""
     shift_sequence_begin_segments = []
@@ -134,9 +138,38 @@ def get_valid_shift_sequence_permutations(
                 all_shifts.append(shift)
         valid_shift_sequence_permutations.append(tuple(all_shifts))
 
-    for perm in valid_shift_sequence_permutations:
+    # for perm in valid_shift_sequence_permutations:
+    #     print(f"Perms:{perm}")
+
+    valid_shift_sequence_permutations_booleans = []
+
+    for tuple_of_shifts in valid_shift_sequence_permutations:
+        shift_booleans = []
+        for day_num, shift in enumerate(tuple_of_shifts):
+            shifts_on_day_num = get_shifts_on_day_num(
+                day_num + 1, shift_days, shifts
+            )
+            for shift_on_day in shifts_on_day_num:
+                if shift_on_day == shift:
+                    shift_booleans.append(1)
+                else:
+                    shift_booleans.append(0)
+        shift_booleans = tuple(shift_booleans)
+        valid_shift_sequence_permutations_booleans.append(shift_booleans)
+
+    for perm in valid_shift_sequence_permutations_booleans:
         print(f"Perms:{perm}")
-    return valid_shift_sequence_permutations
+
+    return valid_shift_sequence_permutations_booleans
+
+
+def get_shifts_on_day_num(day_num, shift_days, shifts):
+    """Get list of shifts on day number."""
+    shifts_on_day_num = []
+    for shift in shifts:
+        if day_num in shift_days[shift]:
+            shifts_on_day_num.append(shift)
+    return shifts_on_day_num
 
 
 def get_length_of_list_of_tuples(list_of_tuples):
@@ -154,18 +187,28 @@ def enforce_shift_sequences(
     shift_days,
     num_days,
     model,
-    valid_shift_sequence_permutations,
+    valid_shift_sequence_permutations_booleans,
 ):
     """Enforce shift sequences."""
-    for staff_member in staff:
-        shift_vars_for_both_periods = [
+    staff_list = staff.keys()
+    staff_list = list(staff_list)[0:6]
+    for staff_member in staff_list:
+        shift_vars_for_current_period = [
             shift_vars[(staff_member, role, day, shift)]
             for role in staff[staff_member]
-            for day in range(-num_days + 1, num_days + 1)
+            for day in range(1, num_days + 1)
             for shift in shifts
             if day in shift_days[shift] or day - num_days in shift_days[shift]
         ]
-    # What to add to model ?
+        print(f"Num variables: {len(shift_vars_for_current_period)}")
+        print(
+            f"Num booleans: {len(valid_shift_sequence_permutations_booleans[0])}"
+        )
+        # Does not currently work if multiple roles
+        model.AddAllowedAssignments(
+            shift_vars_for_current_period,
+            valid_shift_sequence_permutations_booleans,
+        )
 
 
 def create_skill_mix_vars(model, shifts, shift_days, skill_mix_rules):
@@ -242,8 +285,10 @@ def solve(model):
     return solver
 
 
-def display_shifts(num_days, shifts, shift_days, staff, shift_vars, solver):
-    """Display shifts."""
+def display_shifts_by_day(
+    num_days, shifts, shift_days, staff, shift_vars, solver
+):
+    """Display shifts by day."""
     for day in range(1 - num_days, num_days + 1):
         print(f"Day {day}: ", end="")
         for shift in shifts:
@@ -259,6 +304,31 @@ def display_shifts(num_days, shifts, shift_days, staff, shift_vars, solver):
                             == 1
                         ):
                             print(f"{staff_member} ", end="")
+        print()
+
+
+def display_shifts_by_staff(
+    num_days, shifts, shift_days, staff, shift_vars, solver
+):
+    """Display shifts by staff."""
+    for staff_member in staff:
+        print(f"{staff_member}: ", end="")
+        for day in range(1, num_days + 1):
+            shift_worked = "X"
+            print(f"{day}:", end="")
+            for shift in shifts:
+                if day in shift_days[shift]:
+                    for role in staff[staff_member]:
+
+                        if (
+                            solver.Value(
+                                shift_vars[(staff_member, role, day, shift)]
+                            )
+                            == 1
+                        ):
+                            shift_worked = shift
+            print(f"{shift_worked:2} ", end="")
+
         print()
 
 
@@ -621,8 +691,12 @@ def main():
         staff, previous_shifts, shifts, shift_days, model, shift_vars, num_days
     )
     days_in_partial_sequence = 7
-    valid_shift_sequence_permutations = get_valid_shift_sequence_permutations(
-        valid_shift_sequences, days_in_partial_sequence, num_days
+    valid_shift_sequence_permutations_booleans = get_valid_shift_sequence_permutations(
+        valid_shift_sequences,
+        days_in_partial_sequence,
+        num_days,
+        shift_days,
+        shifts,
     )
     enforce_shift_sequences(
         staff,
@@ -631,7 +705,7 @@ def main():
         shift_days,
         num_days,
         model,
-        valid_shift_sequence_permutations,
+        valid_shift_sequence_permutations_booleans,
     )
     skill_mix_vars = create_skill_mix_vars(
         model, shifts, shift_days, skill_mix_rules
@@ -649,9 +723,15 @@ def main():
         staff,
         skill_mix_vars,
     )
+    print(f"Starting solver....")
     solver = solve(model)
-    display_shifts(num_days, shifts, shift_days, staff, shift_vars, solver)
-
+    display_shifts_by_day(
+        num_days, shifts, shift_days, staff, shift_vars, solver
+    )
+    print()
+    display_shifts_by_staff(
+        num_days, shifts, shift_days, staff, shift_vars, solver
+    )
     # for staff_member in staff:
     #     for role in staff[staff_member]:
     #         for day in range(1 - num_days, num_days + 1):
