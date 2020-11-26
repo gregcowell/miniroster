@@ -315,7 +315,7 @@ def display_shifts_by_staff(
         print(f"{staff_member}: ", end="")
         for day in range(1, num_days + 1):
             shift_worked = "X"
-            print(f"{day}:", end="")
+            # print(f"{day}:", end="")
             for shift in shifts:
                 if day in shift_days[shift]:
                     for role in staff[staff_member]:
