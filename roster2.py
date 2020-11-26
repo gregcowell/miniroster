@@ -191,7 +191,7 @@ def enforce_shift_sequences(
 ):
     """Enforce shift sequences."""
     staff_list = staff.keys()
-    staff_list = list(staff_list)[0:6]
+    staff_list = list(staff_list)  # [0:8]
     for staff_member in staff_list:
         shift_vars_for_current_period = [
             shift_vars[(staff_member, role, day, shift)]
@@ -382,6 +382,7 @@ def main():
     }
 
     # Valid Shift Sequences
+    # Can only have a maximum of one of each sequence at the moment
     valid_shift_sequences = [
         [
             "L",
@@ -400,7 +401,8 @@ def main():
             "X",
         ],
         ["S", "S", "S", "S", "X", "W", "W", "X", "S", "S", "S", "S", "X", "X"],
-        ["S", "S", "S", "S", "S", "X", "X"],
+        # ["S", "S", "S", "S", "S", "X", "X"],
+        ["S", "S", "S", "S", "S", "X", "X", "S", "S", "S", "S", "S", "X", "X"],
         ["N", "N", "N", "N", "X", "X", "X"],
     ]
 
