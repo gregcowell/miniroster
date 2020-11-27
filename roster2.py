@@ -2,6 +2,7 @@
 import logging
 from itertools import permutations
 from ortools.sat.python import cp_model
+from memory_profiler import profile
 
 
 class SolutionNotFeasible(Exception):
@@ -77,6 +78,7 @@ def enforce_shifts_already_worked(
                 )
 
 
+# @profile
 def get_valid_shift_sequence_permutations(
     valid_shift_sequences,
     days_in_partial_sequence,
@@ -110,17 +112,17 @@ def get_valid_shift_sequence_permutations(
     #     for shift_sequence in permutations(all_shift_sequences, size):
     #         all_shift_sequence_permutations.append(shift_sequence)
 
-    all_shift_sequence_permutations = [
+    all_shift_sequence_permutations = (
         shift_sequence
         for size in range(1, len(all_shift_sequences))
         for shift_sequence in permutations(all_shift_sequences, size)
-    ]
+    )
 
-    valid_shift_sequence_permutations_interim = [
+    valid_shift_sequence_permutations_interim = (
         shift_sequence
         for shift_sequence in all_shift_sequence_permutations
         if get_length_of_list_of_tuples(shift_sequence) == num_days
-    ]
+    )
 
     # for i, valid_shift_sequence_permutation in enumerate(
     #     valid_shift_sequence_permutations
