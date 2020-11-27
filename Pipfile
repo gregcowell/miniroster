@@ -8,6 +8,7 @@ black = "==19.10b0"
 pylint = "*"
 flake8 = "*"
 pydocstyle = "*"
+memory-profiler = "*"
 
 [packages]
 ortools = "*"
