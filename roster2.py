@@ -159,8 +159,8 @@ def get_valid_shift_sequence_permutations(
         shift_booleans = tuple(shift_booleans)
         valid_shift_sequence_permutations_booleans.append(shift_booleans)
 
-    for perm in valid_shift_sequence_permutations_booleans:
-        print(f"Perms:{perm}")
+    # for perm in valid_shift_sequence_permutations_booleans:
+    #     print(f"Perms:{perm}")
 
     return valid_shift_sequence_permutations_booleans
 
@@ -384,7 +384,7 @@ def main():
     }
 
     # Valid Shift Sequences
-    # Can only have a maximum of one of each sequence at the moment
+    # Can only have a maximum of one of each sequence per roster period at the moment
     valid_shift_sequences = [
         [
             "L",
@@ -403,7 +403,7 @@ def main():
             "X",
         ],
         ["S", "S", "S", "S", "X", "W", "W", "X", "S", "S", "S", "S", "X", "X"],
-        # ["S", "S", "S", "S", "S", "X", "X"],
+        ["S", "S", "S", "S", "S", "X", "X"],
         ["S", "S", "S", "S", "S", "X", "X", "S", "S", "S", "S", "S", "X", "X"],
         ["N", "N", "N", "N", "X", "X", "X"],
     ]
@@ -729,9 +729,9 @@ def main():
     )
     print(f"Starting solver....")
     solver = solve(model)
-    display_shifts_by_day(
-        num_days, shifts, shift_days, staff, shift_vars, solver
-    )
+    # display_shifts_by_day(
+    #     num_days, shifts, shift_days, staff, shift_vars, solver
+    # )
     print()
     display_shifts_by_staff(
         num_days, shifts, shift_days, staff, shift_vars, solver
