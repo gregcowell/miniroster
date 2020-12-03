@@ -2,7 +2,8 @@
 import logging
 from itertools import permutations
 from ortools.sat.python import cp_model
-from memory_profiler import profile
+
+# from memory_profiler import profile
 
 
 class SolutionNotFeasible(Exception):
