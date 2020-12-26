@@ -1,4 +1,20 @@
 """Data for roster2."""
+
+
+# First day must be Monday
+num_days = 28
+# all_days = [day for day in range(1, num_days + 1)]
+week_days = [
+    day
+    for day in range(1, num_days + 1)
+    if day % 7 != 0 and (day + 1) % 7 != 0
+]
+week_ends = [
+    day for day in range(1, num_days + 1) if day % 7 == 0 or (day + 1) % 7 == 0
+]
+
+# print(week_days, week_ends)
+
 staff = {
     "R1": ["R"],
     "R2": ["R"],
@@ -33,7 +49,7 @@ skill_mix_rules = {
 # Can only have a maximum of one of each
 # sequence per roster period at the moment
 valid_shift_sequences = [
-    ["L", "L", "L", "X", "N", "NW", "NW", "X", "X", "X", "L", "L", "X", "X",],
+    ["L", "L", "L", "X", "N", "NW", "NW", "X", "X", "X", "L", "L", "X", "X"],
     ["S", "S", "S", "S", "X", "W", "W", "X", "S", "S", "S", "S", "X", "X"],
     ["S", "S", "S", "S", "S", "X", "X"],
     ["S", "S", "S", "S", "S", "X", "X", "S", "S", "S", "S", "S", "X", "X"],

@@ -6,9 +6,9 @@ from ortools.sat.python import cp_model
 # from memory_profiler import profile
 
 log = logging.getLogger("roster")
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
-)
+# logging.basicConfig(
+#     level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
+# )
 
 
 class SolutionNotFeasible(Exception):
@@ -93,13 +93,13 @@ def get_valid_shift_sequence_permutations(
     shifts,
 ):
     """Get valid shift sequence permutations."""
-    shift_sequence_begin_segments = []
+    # shift_sequence_begin_segments = []
     shift_sequence_end_segments = []
     for valid_shift_sequence in valid_shift_sequences:
         if len(valid_shift_sequence) > days_in_partial_sequence:
-            shift_sequence_begin_segments.append(
-                valid_shift_sequence[0:days_in_partial_sequence]
-            )
+            # shift_sequence_begin_segments.append(
+            #     valid_shift_sequence[0:days_in_partial_sequence]
+            # )
             shift_sequence_end_segments.append(
                 valid_shift_sequence[-days_in_partial_sequence:]
             )
@@ -108,7 +108,7 @@ def get_valid_shift_sequence_permutations(
     # print(f"Valid End: {shift_sequence_end_segments}")
     all_shift_sequences = (
         valid_shift_sequences
-        + shift_sequence_begin_segments
+        # + shift_sequence_begin_segments
         + shift_sequence_end_segments
     )
     # print(f"All: {all_shift_sequences}")
@@ -165,8 +165,8 @@ def get_valid_shift_sequence_permutations(
         shift_booleans = tuple(shift_booleans)
         valid_shift_sequence_permutations_booleans.append(shift_booleans)
 
-    # for perm in valid_shift_sequence_permutations_booleans:
-    #     print(f"Perms:{perm}")
+    for perm in valid_shift_sequence_permutations_booleans:
+        print(f"Perms:{perm}")
 
     return valid_shift_sequence_permutations_booleans
 
