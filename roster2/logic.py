@@ -1,6 +1,6 @@
 """Mini roster 2."""
 import logging
-from itertools import permutations, product
+from itertools import product
 from ortools.sat.python import cp_model
 
 # from memory_profiler import profile
@@ -121,7 +121,8 @@ def get_valid_shift_sequence_permutations(
     # for num, perm in enumerate(all_shift_sequence_permutations):
     #     print(f"{num}:{perm}")
 
-    # Match beg and end seq here
+    # Add code here to ensure end seq always matches prev beg seq
+    # Add code here to ensure beg seq occurs only at end of period
     valid_shift_sequence_permutations_interim = []
     for shift_sequence_group in all_shift_sequence_permutations:
         for shift_sequence in shift_sequence_group:
@@ -167,6 +168,10 @@ def get_valid_shift_sequence_permutations(
 
     # for perm in valid_shift_sequence_permutations_booleans:
     #     print(f"Perms:{perm}")
+
+    print(
+        f"Number of valid sequences = {len(valid_shift_sequence_permutations_booleans)}"
+    )
 
     return valid_shift_sequence_permutations_booleans
 
