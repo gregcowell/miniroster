@@ -1,6 +1,6 @@
 """Mini roster 2."""
 import logging
-from itertools import permutations
+from itertools import permutations, product
 from ortools.sat.python import cp_model
 
 # from memory_profiler import profile
@@ -113,29 +113,22 @@ def get_valid_shift_sequence_permutations(
     )
     # print(f"All: {all_shift_sequences}")
 
-    # all_shift_sequence_permutations = []
-    # for size in range(1, len(all_shift_sequences)):
-    #     for shift_sequence in permutations(all_shift_sequences, size):
-    #         all_shift_sequence_permutations.append(shift_sequence)
+    all_shift_sequence_permutations = []
+    for size in range(0, num_days // days_in_partial_sequence):
+        all_shift_sequence_permutations.append(
+            product(all_shift_sequences, repeat=size)
+        )
+    # for num, perm in enumerate(all_shift_sequence_permutations):
+    #     print(f"{num}:{perm}")
 
-    all_shift_sequence_permutations = (
-        shift_sequence
-        for size in range(1, len(all_shift_sequences))
-        for shift_sequence in permutations(all_shift_sequences, size)
-    )
-
-    valid_shift_sequence_permutations_interim = (
-        shift_sequence
-        for shift_sequence in all_shift_sequence_permutations
-        if get_length_of_list_of_tuples(shift_sequence) == num_days
-    )
-
-    # for i, valid_shift_sequence_permutation in enumerate(
-    #     valid_shift_sequence_permutations
-    # ):
-    #     print(
-    #         f"{i + 1}: Length:{get_length_of_list_of_tuples(valid_shift_sequence_permutation)} Perm:{valid_shift_sequence_permutation}"
-    #     )
+    # Match beg and end seq here
+    valid_shift_sequence_permutations_interim = []
+    for shift_sequence_group in all_shift_sequence_permutations:
+        for shift_sequence in shift_sequence_group:
+            if get_length_of_list_of_tuples(shift_sequence) == num_days:
+                valid_shift_sequence_permutations_interim.append(
+                    shift_sequence
+                )
 
     valid_shift_sequence_permutations = []
     for tuple_of_shift_lists in valid_shift_sequence_permutations_interim:
@@ -148,6 +141,13 @@ def get_valid_shift_sequence_permutations(
 
     # for perm in valid_shift_sequence_permutations:
     #     print(f"Perms:{perm}")
+
+    # for i, valid_shift_sequence_permutation in enumerate(
+    #     valid_shift_sequence_permutations
+    # ):
+    #     print(
+    #         f"{i + 1}: Length:{len(valid_shift_sequence_permutation)} Perm:{valid_shift_sequence_permutation}"
+    #     )
 
     valid_shift_sequence_permutations_booleans = []
 
