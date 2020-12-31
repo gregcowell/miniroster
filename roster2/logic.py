@@ -121,8 +121,9 @@ def get_valid_shift_sequence_permutations(
     # for num, perm in enumerate(all_shift_sequence_permutations):
     #     print(f"{num}:{perm}")
 
-    # Add code here to ensure end seq always matches prev beg seq
-    # Add code here to ensure beg seq occurs only at end of period
+    # Add code here to ensure end seq always at start
+    # Add code here to ensure beg seq always at end
+    # Need a way to enforce beg seq based on previous roster
     valid_shift_sequence_permutations_interim = []
     for shift_sequence_group in all_shift_sequence_permutations:
         for shift_sequence in shift_sequence_group:
