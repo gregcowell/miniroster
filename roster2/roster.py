@@ -46,7 +46,7 @@ def main():
         staff, previous_shifts, shifts, shift_days, model, shift_vars, num_days
     )
     days_in_partial_sequence = 7
-    valid_shift_sequence_permutations_booleans = get_valid_shift_sequence_permutations(
+    valid_shift_sequence_permutations = get_valid_shift_sequence_permutations(
         valid_shift_sequences,
         days_in_partial_sequence,
         num_days,
@@ -60,7 +60,7 @@ def main():
         shift_days,
         num_days,
         model,
-        valid_shift_sequence_permutations_booleans,
+        valid_shift_sequence_permutations,
     )
     skill_mix_vars = create_skill_mix_vars(
         model, shifts, shift_days, skill_mix_rules
