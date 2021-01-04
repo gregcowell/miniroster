@@ -84,6 +84,34 @@ def enforce_shifts_already_worked(
                 )
 
 
+def enforce_completion_of_shift_segments(
+    valid_shift_sequences, days_in_partial_sequence, previous_shifts
+):
+    """Enforce completion of shift segments."""
+    shift_sequence_begin_segments = []
+    shift_sequence_end_segments = []
+
+    for valid_shift_sequence in valid_shift_sequences:
+        if len(valid_shift_sequence) > days_in_partial_sequence:
+            shift_sequence_begin_segments.append(
+                valid_shift_sequence[0:days_in_partial_sequence:]
+            )
+            shift_sequence_end_segments.append(
+                valid_shift_sequence[-days_in_partial_sequence:]
+            )
+    for staff_member in previous_shifts:
+        for shift_sequence_begin_segment in shift_sequence_begin_segments:
+            # print(f"Beg: {shift_sequence_begin_segment}")
+            # print(
+            #     f"Prev: {previous_shifts[staff_member][-days_in_partial_sequence:]}"
+            # )
+            if (
+                shift_sequence_begin_segment
+                == previous_shifts[staff_member][-days_in_partial_sequence:]
+            ):
+                print("yes")
+
+
 # @profile
 def get_valid_shift_sequence_permutations(
     valid_shift_sequences,
@@ -93,52 +121,45 @@ def get_valid_shift_sequence_permutations(
     shifts,
 ):
     """Get valid shift sequence permutations."""
-    shift_sequence_begin_segments = []
     shift_sequence_end_segments = []
     for valid_shift_sequence in valid_shift_sequences:
         if len(valid_shift_sequence) > days_in_partial_sequence:
-            shift_sequence_begin_segments.append(
-                valid_shift_sequence[0:days_in_partial_sequence]
-            )
             shift_sequence_end_segments.append(
                 valid_shift_sequence[-days_in_partial_sequence:]
             )
     # print(f"Valid: {valid_shift_sequences}")
-    # print(f"Valid Begin: {shift_sequence_begin_segments}")
     # print(f"Valid End: {shift_sequence_end_segments}")
-    all_shift_sequences = valid_shift_sequences + shift_sequence_begin_segments
-    # print(f"All: {all_shift_sequences}")
 
+    # Does not work for days_in_partial_sequence = 0 etc
     all_shift_sequence_permutations = []
-    for size in range(0, num_days // days_in_partial_sequence):
+    for size in range(0, num_days // days_in_partial_sequence + 1):
         all_shift_sequence_permutations.append(
-            product(all_shift_sequences, repeat=size)
+            product(valid_shift_sequences, repeat=size)
         )
     all_shift_sequence_permutations_with_end = []
-    for size in range(0, num_days // days_in_partial_sequence - 1):
+    for size in range(0, num_days // days_in_partial_sequence):
         all_shift_sequence_permutations_with_end.append(
-            product(all_shift_sequences, repeat=size)
+            product(valid_shift_sequences, repeat=size)
         )
 
     # for num, perm in enumerate(all_shift_sequence_permutations):
     #     print(f"{num}:{perm}")
 
-    # Add code here to ensure end seq always at start
-    # Add code here to ensure beg seq always at end
     # Need a way to enforce beg seq based on previous roster
     valid_shift_sequence_permutations_interim = []
     for shift_sequence_group in all_shift_sequence_permutations:
         for shift_sequence in shift_sequence_group:
-            if get_length_of_list_of_iterables(shift_sequence) == num_days:
+            if get_length_of_list_of_iterables(shift_sequence) >= num_days:
                 valid_shift_sequence_permutations_interim.append(
-                    shift_sequence
+                    shift_sequence[0:num_days]
                 )
     for shift_sequence_group in all_shift_sequence_permutations_with_end:
         for shift_sequence in shift_sequence_group:
-            if get_length_of_list_of_iterables(shift_sequence) == num_days:
+            if get_length_of_list_of_iterables(shift_sequence) >= num_days:
                 for shift_sequence_end_segment in shift_sequence_end_segments:
                     valid_shift_sequence_permutations_interim.append(
-                        shift_sequence_end_segment + list(shift_sequence)
+                        shift_sequence_end_segment
+                        + list(shift_sequence)[0:num_days]
                     )
 
     valid_shift_sequence_permutations = []

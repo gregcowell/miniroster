@@ -23,6 +23,7 @@ from logic import (
     enforce_shift_sequences,
     get_valid_shift_sequence_permutations,
     solve,
+    enforce_completion_of_shift_segments,
 )
 
 # from memory_profiler import profile
@@ -53,6 +54,7 @@ def main():
         shift_days,
         shifts,
     )
+    # print(valid_shift_sequence_permutations)
     enforce_shift_sequences(
         staff,
         shift_vars,
@@ -78,6 +80,11 @@ def main():
         staff,
         skill_mix_vars,
     )
+
+    enforce_completion_of_shift_segments(
+        valid_shift_sequences, days_in_partial_sequence, previous_shifts
+    )
+
     print("Starting solver....")
     solver = solve(model)
     # display_shifts_by_day(
