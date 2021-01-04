@@ -109,7 +109,7 @@ def enforce_completion_of_shift_segments(
                 shift_sequence_begin_segment
                 == previous_shifts[staff_member][-days_in_partial_sequence:]
             ):
-                print("yes")
+                print("Partial sequence at end of previous period")
 
 
 # @profile
@@ -131,6 +131,7 @@ def get_valid_shift_sequence_permutations(
     # print(f"Valid End: {shift_sequence_end_segments}")
 
     # Does not work for days_in_partial_sequence = 0 etc
+    # Change to days in smallest sequence ?
     repeat = num_days // days_in_partial_sequence
 
     valid_shift_sequence_permutations_interim = []
