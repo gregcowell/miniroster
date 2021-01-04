@@ -106,11 +106,7 @@ def get_valid_shift_sequence_permutations(
     # print(f"Valid: {valid_shift_sequences}")
     # print(f"Valid Begin: {shift_sequence_begin_segments}")
     # print(f"Valid End: {shift_sequence_end_segments}")
-    all_shift_sequences = (
-        valid_shift_sequences
-        + shift_sequence_begin_segments
-        + shift_sequence_end_segments
-    )
+    all_shift_sequences = valid_shift_sequences + shift_sequence_begin_segments
     # print(f"All: {all_shift_sequences}")
 
     all_shift_sequence_permutations = []
@@ -118,6 +114,12 @@ def get_valid_shift_sequence_permutations(
         all_shift_sequence_permutations.append(
             product(all_shift_sequences, repeat=size)
         )
+    all_shift_sequence_permutations_with_end = []
+    for size in range(0, num_days // days_in_partial_sequence - 1):
+        all_shift_sequence_permutations_with_end.append(
+            product(all_shift_sequences, repeat=size)
+        )
+
     # for num, perm in enumerate(all_shift_sequence_permutations):
     #     print(f"{num}:{perm}")
 
@@ -127,10 +129,17 @@ def get_valid_shift_sequence_permutations(
     valid_shift_sequence_permutations_interim = []
     for shift_sequence_group in all_shift_sequence_permutations:
         for shift_sequence in shift_sequence_group:
-            if get_length_of_list_of_tuples(shift_sequence) == num_days:
+            if get_length_of_list_of_iterables(shift_sequence) == num_days:
                 valid_shift_sequence_permutations_interim.append(
                     shift_sequence
                 )
+    for shift_sequence_group in all_shift_sequence_permutations_with_end:
+        for shift_sequence in shift_sequence_group:
+            if get_length_of_list_of_iterables(shift_sequence) == num_days:
+                for shift_sequence_end_segment in shift_sequence_end_segments:
+                    valid_shift_sequence_permutations_interim.append(
+                        shift_sequence_end_segment + list(shift_sequence)
+                    )
 
     valid_shift_sequence_permutations = []
     for tuple_of_shift_lists in valid_shift_sequence_permutations_interim:
@@ -186,7 +195,7 @@ def get_shifts_on_day_num(day_num, shift_days, shifts):
     return shifts_on_day_num
 
 
-def get_length_of_list_of_tuples(list_of_tuples):
+def get_length_of_list_of_iterables(list_of_tuples):
     """Get the total length of a list of tuples."""
     length = 0
     for tuple_item in list_of_tuples:
