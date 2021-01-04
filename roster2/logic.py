@@ -131,36 +131,19 @@ def get_valid_shift_sequence_permutations(
     # print(f"Valid End: {shift_sequence_end_segments}")
 
     # Does not work for days_in_partial_sequence = 0 etc
-    all_shift_sequence_permutations = []
-    for size in range(0, num_days // days_in_partial_sequence + 1):
-        all_shift_sequence_permutations.append(
-            product(valid_shift_sequences, repeat=size)
-        )
-    all_shift_sequence_permutations_with_end = []
-    for size in range(0, num_days // days_in_partial_sequence):
-        all_shift_sequence_permutations_with_end.append(
-            product(valid_shift_sequences, repeat=size)
-        )
+    repeat = num_days // days_in_partial_sequence
 
-    # for num, perm in enumerate(all_shift_sequence_permutations):
-    #     print(f"{num}:{perm}")
-
-    # Need a way to enforce beg seq based on previous roster
     valid_shift_sequence_permutations_interim = []
-    for shift_sequence_group in all_shift_sequence_permutations:
-        for shift_sequence in shift_sequence_group:
-            if get_length_of_list_of_iterables(shift_sequence) >= num_days:
-                valid_shift_sequence_permutations_interim.append(
-                    shift_sequence[0:num_days]
-                )
-    for shift_sequence_group in all_shift_sequence_permutations_with_end:
-        for shift_sequence in shift_sequence_group:
-            if get_length_of_list_of_iterables(shift_sequence) >= num_days:
-                for shift_sequence_end_segment in shift_sequence_end_segments:
-                    valid_shift_sequence_permutations_interim.append(
-                        shift_sequence_end_segment
-                        + list(shift_sequence)[0:num_days]
-                    )
+    for shift_sequence in product(valid_shift_sequences, repeat=repeat):
+        valid_shift_sequence_permutations_interim.append(shift_sequence)
+    for shift_sequence in product(valid_shift_sequences, repeat=repeat - 1):
+        for shift_sequence_end_segment in shift_sequence_end_segments:
+            valid_shift_sequence_permutations_interim.append(
+                shift_sequence_end_segment + list(shift_sequence)
+            )
+
+    # for stuff in valid_shift_sequence_permutations_interim:
+    #     print(f"Perm:{stuff}")
 
     valid_shift_sequence_permutations = []
     for tuple_of_shift_lists in valid_shift_sequence_permutations_interim:
@@ -169,16 +152,12 @@ def get_valid_shift_sequence_permutations(
         for list_of_shifts in tuple_of_shift_lists:
             for shift in list_of_shifts:
                 all_shifts.append(shift)
-        valid_shift_sequence_permutations.append(tuple(all_shifts))
+        # Truncate to period
+        valid_shift_sequence_permutations.append(tuple(all_shifts[0:num_days]))
 
-    # for perm in valid_shift_sequence_permutations:
-    #     print(f"Perms:{perm}")
-
-    # for i, valid_shift_sequence_permutation in enumerate(
-    #     valid_shift_sequence_permutations
-    # ):
+    # for valid_shift_sequence_permutation in valid_shift_sequence_permutations:
     #     print(
-    #         f"{i + 1}: Length:{len(valid_shift_sequence_permutation)} Perm:{valid_shift_sequence_permutation}"
+    #         f"Valid:{valid_shift_sequence_permutation} Len:{len(valid_shift_sequence_permutation)}"
     #     )
 
     valid_shift_sequence_permutations_booleans = []
@@ -200,9 +179,9 @@ def get_valid_shift_sequence_permutations(
     # for perm in valid_shift_sequence_permutations_booleans:
     #     print(f"Perms:{perm}")
 
-    print(
-        f"Number of valid sequences = {len(valid_shift_sequence_permutations_booleans)}"
-    )
+    # print(
+    #     f"Number of valid sequences = {len(valid_shift_sequence_permutations_booleans)}"
+    # )
 
     return valid_shift_sequence_permutations_booleans
 
