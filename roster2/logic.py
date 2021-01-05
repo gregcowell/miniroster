@@ -325,6 +325,14 @@ def enforce_skill_mix_rules(
                     ).OnlyEnforceIf(skill_mix_vars[(day, shift, rule_num)])
 
 
+def configure_objective(shift_vars, staff, shifts):
+    """Configure objective function.
+
+    Need to allocate unpleasant shifts fairly.
+    """
+    pass
+
+
 def solve(model):
     """Solve model."""
     solver = cp_model.CpSolver()
