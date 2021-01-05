@@ -85,7 +85,14 @@ def enforce_shifts_already_worked(
 
 
 def enforce_completion_of_shift_segments(
-    valid_shift_sequences, days_in_partial_sequence, previous_shifts
+    valid_shift_sequences,
+    days_in_partial_sequence,
+    previous_shifts,
+    shift_vars,
+    model,
+    staff,
+    shift_days,
+    shifts,
 ):
     """Enforce completion of shift segments."""
     shift_sequence_begin_segments = []
@@ -100,7 +107,9 @@ def enforce_completion_of_shift_segments(
                 valid_shift_sequence[-days_in_partial_sequence:]
             )
     for staff_member in previous_shifts:
-        for shift_sequence_begin_segment in shift_sequence_begin_segments:
+        for seg_num, shift_sequence_begin_segment in enumerate(
+            shift_sequence_begin_segments
+        ):
             # print(f"Beg: {shift_sequence_begin_segment}")
             # print(
             #     f"Prev: {previous_shifts[staff_member][-days_in_partial_sequence:]}"
@@ -109,7 +118,37 @@ def enforce_completion_of_shift_segments(
                 shift_sequence_begin_segment
                 == previous_shifts[staff_member][-days_in_partial_sequence:]
             ):
-                print("Partial sequence at end of previous period")
+                # print("Partial sequence at end of previous period")
+                shift_sequence_end_segment = shift_sequence_end_segments[
+                    seg_num
+                ]
+                for day_num, shift in enumerate(shift_sequence_end_segment):
+                    if shift == "X":
+                        for shift in shifts:
+                            if day_num + 1 in shift_days[shift]:
+                                model.Add(
+                                    shift_vars[
+                                        (
+                                            staff_member,
+                                            staff[staff_member][0],
+                                            day_num + 1,
+                                            shift,
+                                        )
+                                    ]
+                                    == 0
+                                )
+                    else:
+                        model.Add(
+                            shift_vars[
+                                (
+                                    staff_member,
+                                    staff[staff_member][0],
+                                    day_num + 1,
+                                    shift,
+                                )
+                            ]
+                            == 1
+                        )
 
 
 # @profile

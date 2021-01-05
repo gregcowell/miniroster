@@ -82,7 +82,14 @@ def main():
     )
 
     enforce_completion_of_shift_segments(
-        valid_shift_sequences, days_in_partial_sequence, previous_shifts
+        valid_shift_sequences,
+        days_in_partial_sequence,
+        previous_shifts,
+        shift_vars,
+        model,
+        staff,
+        shift_days,
+        shifts,
     )
 
     print("Starting solver....")
