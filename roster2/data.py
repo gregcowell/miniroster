@@ -55,6 +55,8 @@ valid_shift_sequences = [
     ["N", "N", "N", "N", "X", "X", "X"],
 ]
 
+unpleasant_shifts = ["NW", "W", "N"]
+
 # Set previous shift variables to same as spread sheet
 previous_shifts = {
     "R1": [

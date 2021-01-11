@@ -325,12 +325,35 @@ def enforce_skill_mix_rules(
                     ).OnlyEnforceIf(skill_mix_vars[(day, shift, rule_num)])
 
 
-def configure_objective(shift_vars, staff, shifts):
+def configure_objective(
+    model, shift_vars, staff, unpleasant_shifts, num_days, shift_days,
+):
     """Configure objective function.
 
-    Need to allocate unpleasant shifts fairly.
+    Need to allocate unpleasant shifts fairly so minimise
+    total number of unpleasant shifts over previous and
+    current roster periods. Can add weights to different
+    unpleasant shifts if desired.
     """
-    pass
+    max_unpleasant_shifts = model.NewIntVar(
+        0, 2 * num_days, "max_unpleasant_shifts"
+    )
+
+    for staff_member in staff:
+        model.Add(
+            sum(
+                shift_vars[(staff_member, role, day, shift)]
+                for role in staff[staff_member]
+                for shift in unpleasant_shifts
+                for day in range(-num_days + 1, num_days + 1)
+                if day in shift_days[shift]
+                or day + num_days in shift_days[shift]
+            )
+            <= max_unpleasant_shifts
+        )
+
+    model.Minimize(max_unpleasant_shifts)
+    return max_unpleasant_shifts
 
 
 def solve(model):
@@ -379,7 +402,13 @@ def display_shifts_by_day(
 
 
 def display_shifts_by_staff(
-    num_days, shifts, shift_days, staff, shift_vars, solver
+    num_days,
+    shifts,
+    shift_days,
+    staff,
+    shift_vars,
+    solver,
+    max_unpleasant_shifts,
 ):
     """Display shifts by staff."""
     for staff_member in staff:
@@ -401,3 +430,8 @@ def display_shifts_by_staff(
             print(f"{shift_worked:2} ", end="")
 
         print()
+    print()
+    print(
+        f"Maximum unpleasant shifts over previous and current period is {solver.Value(max_unpleasant_shifts)}"
+    )
+    print()

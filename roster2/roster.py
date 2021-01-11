@@ -10,6 +10,7 @@ from data import (
     previous_shifts,
     valid_shift_sequences,
     skill_mix_rules,
+    unpleasant_shifts,
 )
 
 from logic import (
@@ -24,6 +25,7 @@ from logic import (
     get_valid_shift_sequence_permutations,
     solve,
     enforce_completion_of_shift_segments,
+    configure_objective,
 )
 
 # from memory_profiler import profile
@@ -92,6 +94,10 @@ def main():
         shifts,
     )
 
+    max_unpleasant_shifts = configure_objective(
+        model, shift_vars, staff, unpleasant_shifts, num_days, shift_days,
+    )
+
     print("Starting solver....")
     solver = solve(model)
     # display_shifts_by_day(
@@ -99,7 +105,13 @@ def main():
     # )
     print()
     display_shifts_by_staff(
-        num_days, shifts, shift_days, staff, shift_vars, solver
+        num_days,
+        shifts,
+        shift_days,
+        staff,
+        shift_vars,
+        solver,
+        max_unpleasant_shifts,
     )
     # for staff_member in staff:
     #     for role in staff[staff_member]:
