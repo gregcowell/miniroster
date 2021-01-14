@@ -3,12 +3,7 @@ import logging
 from itertools import product
 from ortools.sat.python import cp_model
 
-# from memory_profiler import profile
-
 log = logging.getLogger("roster")
-# logging.basicConfig(
-#     level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
-# )
 
 
 class SolutionNotFeasible(Exception):
@@ -110,15 +105,10 @@ def enforce_completion_of_shift_segments(
         for seg_num, shift_sequence_begin_segment in enumerate(
             shift_sequence_begin_segments
         ):
-            # print(f"Beg: {shift_sequence_begin_segment}")
-            # print(
-            #     f"Prev: {previous_shifts[staff_member][-days_in_partial_sequence:]}"
-            # )
             if (
                 shift_sequence_begin_segment
                 == previous_shifts[staff_member][-days_in_partial_sequence:]
             ):
-                # print("Partial sequence at end of previous period")
                 shift_sequence_end_segment = shift_sequence_end_segments[
                     seg_num
                 ]
@@ -151,7 +141,6 @@ def enforce_completion_of_shift_segments(
                         )
 
 
-# @profile
 def get_valid_shift_sequence_permutations(
     valid_shift_sequences,
     days_in_partial_sequence,
@@ -166,11 +155,7 @@ def get_valid_shift_sequence_permutations(
             shift_sequence_end_segments.append(
                 valid_shift_sequence[-days_in_partial_sequence:]
             )
-    # print(f"Valid: {valid_shift_sequences}")
-    # print(f"Valid End: {shift_sequence_end_segments}")
-
-    # Does not work for days_in_partial_sequence = 0 etc
-    # Change to days in smallest sequence ?
+    # Partial days in sequence must be half of size of maximum valid sequence
     repeat = num_days // days_in_partial_sequence
 
     valid_shift_sequence_permutations_interim = []
@@ -182,9 +167,6 @@ def get_valid_shift_sequence_permutations(
                 shift_sequence_end_segment + list(shift_sequence)
             )
 
-    # for stuff in valid_shift_sequence_permutations_interim:
-    #     print(f"Perm:{stuff}")
-
     valid_shift_sequence_permutations = []
     for tuple_of_shift_lists in valid_shift_sequence_permutations_interim:
         # tuple of lists -> tuple of shifts
@@ -194,11 +176,6 @@ def get_valid_shift_sequence_permutations(
                 all_shifts.append(shift)
         # Truncate to period
         valid_shift_sequence_permutations.append(tuple(all_shifts[0:num_days]))
-
-    # for valid_shift_sequence_permutation in valid_shift_sequence_permutations:
-    #     print(
-    #         f"Valid:{valid_shift_sequence_permutation} Len:{len(valid_shift_sequence_permutation)}"
-    #     )
 
     valid_shift_sequence_permutations_booleans = []
 
@@ -215,13 +192,6 @@ def get_valid_shift_sequence_permutations(
                     shift_booleans.append(0)
         shift_booleans = tuple(shift_booleans)
         valid_shift_sequence_permutations_booleans.append(shift_booleans)
-
-    # for perm in valid_shift_sequence_permutations_booleans:
-    #     print(f"Perms:{perm}")
-
-    # print(
-    #     f"Number of valid sequences = {len(valid_shift_sequence_permutations_booleans)}"
-    # )
 
     return valid_shift_sequence_permutations_booleans
 
@@ -253,8 +223,7 @@ def enforce_shift_sequences(
     valid_shift_sequence_permutations_booleans,
 ):
     """Enforce shift sequences."""
-    staff_list = staff.keys()
-    staff_list = list(staff_list)  # [0:8]
+    staff_list = list(staff.keys())
     for staff_member in staff_list:
         shift_vars_for_current_period = [
             shift_vars[(staff_member, role, day, shift)]
@@ -263,10 +232,6 @@ def enforce_shift_sequences(
             for shift in shifts
             if day in shift_days[shift] or day - num_days in shift_days[shift]
         ]
-        # print(f"Num variables: {len(shift_vars_for_current_period)}")
-        # print(
-        #     f"Num booleans: {len(valid_shift_sequence_permutations_booleans[0])}"
-        # )
         # Does not currently work if multiple roles
         model.AddAllowedAssignments(
             shift_vars_for_current_period,
@@ -415,7 +380,6 @@ def display_shifts_by_staff(
         print(f"{staff_member}: ", end="")
         for day in range(1, num_days + 1):
             shift_worked = "X"
-            # print(f"{day}:", end="")
             for shift in shifts:
                 if day in shift_days[shift]:
                     for role in staff[staff_member]:
@@ -430,8 +394,7 @@ def display_shifts_by_staff(
             print(f"{shift_worked:2} ", end="")
 
         print()
-    print()
     print(
-        f"Maximum unpleasant shifts over previous and current period is {solver.Value(max_unpleasant_shifts)}"
+        f"Maximum unpleasant shifts over previous "
+        f"and current period is {solver.Value(max_unpleasant_shifts)}"
     )
-    print()

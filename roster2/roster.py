@@ -28,8 +28,6 @@ from logic import (
     configure_objective,
 )
 
-# from memory_profiler import profile
-
 log = logging.getLogger("roster")
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s"
@@ -56,7 +54,6 @@ def main():
         shift_days,
         shifts,
     )
-    # print(valid_shift_sequence_permutations)
     enforce_shift_sequences(
         staff,
         shift_vars,
@@ -69,7 +66,6 @@ def main():
     skill_mix_vars = create_skill_mix_vars(
         model, shifts, shift_days, skill_mix_rules
     )
-
     enforce_one_skill_mix_rule_per_shift(
         shifts, shift_days, skill_mix_vars, skill_mix_rules, model
     )
@@ -82,7 +78,6 @@ def main():
         staff,
         skill_mix_vars,
     )
-
     enforce_completion_of_shift_segments(
         valid_shift_sequences,
         days_in_partial_sequence,
@@ -93,17 +88,11 @@ def main():
         shift_days,
         shifts,
     )
-
     max_unpleasant_shifts = configure_objective(
         model, shift_vars, staff, unpleasant_shifts, num_days, shift_days,
     )
-
-    print("Starting solver....")
+    log.info("Starting solver....")
     solver = solve(model)
-    # display_shifts_by_day(
-    #     num_days, shifts, shift_days, staff, shift_vars, solver
-    # )
-    print()
     display_shifts_by_staff(
         num_days,
         shifts,
@@ -113,19 +102,6 @@ def main():
         solver,
         max_unpleasant_shifts,
     )
-    # for staff_member in staff:
-    #     for role in staff[staff_member]:
-    #         for day in range(1 - num_days, num_days + 1):
-    #             for shift in shifts:
-    #                 if (
-    #                     day in shift_days[shift]
-    #                     or day + num_days in shift_days[shift]
-    #                 ):
-    #                     print(shift_vars[(staff_member, role, day, shift)])
 
 
 main()
-
-
-# Objective function, number of shifts equal
-# Equal numbers of weekly sequences over time

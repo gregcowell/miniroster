@@ -1,6 +1,5 @@
 """Data for roster2."""
 
-
 # First day must be Monday
 num_days = 28
 # all_days = [day for day in range(1, num_days + 1)]
@@ -12,8 +11,6 @@ week_days = [
 week_ends = [
     day for day in range(1, num_days + 1) if day % 7 == 0 or (day + 1) % 7 == 0
 ]
-
-# print(week_days, week_ends)
 
 staff = {
     "R1": ["R"],
@@ -45,7 +42,6 @@ skill_mix_rules = {
     "W": ({"R": 1},),
 }
 
-# Valid Shift Sequences
 valid_shift_sequences = [
     ["L", "L", "L", "X", "N", "NW", "NW", "X", "X", "X", "L", "L", "X", "X"],
     ["S", "S", "S", "S", "X", "W", "W", "X", "S", "S", "S", "S", "X", "X"],
@@ -55,7 +51,7 @@ valid_shift_sequences = [
 
 unpleasant_shifts = ["NW", "W", "N"]
 
-# Set previous shift variables to same as spread sheet
+# Previous roster period
 previous_shifts = {
     "R1": [
         "L",
