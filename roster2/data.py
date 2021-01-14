@@ -46,8 +46,6 @@ skill_mix_rules = {
 }
 
 # Valid Shift Sequences
-# Can only have a maximum of one of each
-# sequence per roster period at the moment
 valid_shift_sequences = [
     ["L", "L", "L", "X", "N", "NW", "NW", "X", "X", "X", "L", "L", "X", "X"],
     ["S", "S", "S", "S", "X", "W", "W", "X", "S", "S", "S", "S", "X", "X"],
