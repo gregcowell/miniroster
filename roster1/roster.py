@@ -1,4 +1,5 @@
 """Mini roster 1."""
+
 import logging
 from ortools.sat.python import cp_model
 
@@ -59,8 +60,7 @@ for shift in range(num_shifts):
 for staff_member in staff:
     for shift in range(num_shifts):
         shifts = [
-            shift_vars[(staff_member, group, shift)]
-            for group in staff[staff_member]
+            shift_vars[(staff_member, group, shift)] for group in staff[staff_member]
         ]
         model.Add(sum(shifts) <= 1)
 
@@ -98,9 +98,7 @@ def enforce_group_together(group, days_per_roster):
     for shift in range(num_shifts):
         shift_vars_for_this_shift = []
         for staff_member in group_staff:
-            shift_vars_for_this_shift.append(
-                shift_vars[(staff_member, group, shift)]
-            )
+            shift_vars_for_this_shift.append(shift_vars[(staff_member, group, shift)])
         model.AddBoolAnd(shift_vars_for_this_shift).OnlyEnforceIf(
             intermediate_shift_vars[shift]
         )
@@ -121,15 +119,14 @@ def enforce_supervisor(group, supervisors):
             supervisor_shift_vars = []
             for supervisor in supervisors:
                 for group in staff[supervisor]:
-                    supervisor_shift_vars.append(
-                        shift_vars[(supervisor, group, shift)]
-                    )
+                    supervisor_shift_vars.append(shift_vars[(supervisor, group, shift)])
             model.AddBoolOr(supervisor_shift_vars).OnlyEnforceIf(
                 shift_vars[(staff_member, staff[staff_member][0], shift)]
             )
 
 
 enforce_supervisor(group=3, supervisors=("Mike", "Belinda"))
+
 
 # Solve
 solver = cp_model.CpSolver()
@@ -140,10 +137,7 @@ if solution_status == cp_model.MODEL_INVALID:
     log.info("Solution is MODEL_INVALID")
 if solution_status == cp_model.UNKNOWN:
     log.info("Solution is UNKNOWN")
-if (
-    solution_status != cp_model.FEASIBLE
-    and solution_status != cp_model.OPTIMAL
-):
+if solution_status != cp_model.FEASIBLE and solution_status != cp_model.OPTIMAL:
     log.info("No feasible solution, raising exception...")
     raise SolutionNotFeasible("No feasible solutions.")
 
